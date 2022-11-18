@@ -9,7 +9,8 @@ public class InputManager : MonoBehaviour
     PlayerControls playerControls;
 
     [Header("Input Variables")]
-    [HideInInspector] public Vector2 moveInput;
+    [HideInInspector] public float accelerationInput;
+    [HideInInspector] public float steeringInput;
     [HideInInspector] public Vector2 lookInput;
 
     void Awake()
@@ -28,7 +29,8 @@ public class InputManager : MonoBehaviour
 
     void Update()
     {
-        moveInput = playerControls.Player.Movement.ReadValue<Vector2>();
+        accelerationInput = playerControls.Player.Acceleration.ReadValue<float>();
+        steeringInput = playerControls.Player.Steering.ReadValue<float>();
         lookInput = playerControls.Player.Look.ReadValue<Vector2>();
     }
 

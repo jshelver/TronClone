@@ -2,10 +2,12 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+[RequireComponent(typeof(Rigidbody))]
 public class CameraController : MonoBehaviour
 {
     [Header("References")]
     [SerializeField] Transform lookTarget;
+    Rigidbody rb;
     Camera mainCamera;
 
     [Header("Camera Settings")]
@@ -22,9 +24,12 @@ public class CameraController : MonoBehaviour
     float pitch; // X-axis rotation (vertical)
     float yaw; // Y-axis rotation (horizontal)
     Vector3 currentRotation, targetRotation, rotationSmoothVelocity;
+    float currentPitch, targetPitch, pitchSmoothVelocity;
+    float currentYaw, targetYaw, yawSmoothVelocity;
 
     void Start()
     {
+        rb = GetComponent<Rigidbody>();
         timer = 0;
         mainCamera = Camera.main;
         Cursor.lockState = CursorLockMode.Locked;
@@ -34,24 +39,22 @@ public class CameraController : MonoBehaviour
     void LateUpdate()
     {
         HandleCameraControls(InputManager.instance.lookInput);
+        SetCameraDistance();
     }
 
     private void HandleCameraControls(Vector2 lookInput)
     {
         // Get mouse input
-        yaw += lookInput.x * mouseSensitivity * Time.deltaTime;
-        pitch -= lookInput.y * mouseSensitivity * Time.deltaTime;
-        pitch = Mathf.Clamp(pitch, minViewAngle, maxViewAngle);
+        targetYaw += lookInput.x * mouseSensitivity * Time.deltaTime;
+        targetPitch -= lookInput.y * mouseSensitivity * Time.deltaTime;
+        targetPitch = Mathf.Clamp(targetPitch, minViewAngle, maxViewAngle);
 
         ResetCameraRotation(lookInput);
 
         // Rotate camera
-        targetRotation = new Vector3(pitch, yaw, 0f);
-        currentRotation = Vector3.SmoothDamp(currentRotation, targetRotation, ref rotationSmoothVelocity, resetCamera ? resetCameraSmoothTime : rotationSmoothTime);
-        mainCamera.transform.eulerAngles = currentRotation;
-
-        // Set distance away from target
-        mainCamera.transform.position = lookTarget.position - mainCamera.transform.forward * distanceFromTarget;
+        currentPitch = Mathf.SmoothDampAngle(currentPitch, targetPitch, ref pitchSmoothVelocity, resetCamera ? resetCameraSmoothTime : rotationSmoothTime);
+        currentYaw = Mathf.SmoothDampAngle(currentYaw, targetYaw, ref yawSmoothVelocity, resetCamera ? resetCameraSmoothTime : rotationSmoothTime);
+        mainCamera.transform.eulerAngles = new Vector3(currentPitch, currentYaw, 0f);
     }
 
     private void ResetCameraRotation(Vector2 lookInput)
@@ -75,26 +78,20 @@ public class CameraController : MonoBehaviour
         }
         else
         {
-            pitch = defaultPitchAngle;
-
-            // Yaw will be set to the closest unit circle equivalent of zero so it takes the shortest reset route
-            float yawAngleOnUnitCircle = yaw % 360;
-            if (yawAngleOnUnitCircle > 180f)
-            {
-                yaw = yaw + (360 - yawAngleOnUnitCircle);
-            }
-            else
-            {
-                yaw = yaw - yawAngleOnUnitCircle;
-            }
-
-
             // If any look input then stop resetting the camera
             if (lookInput != Vector2.zero)
             {
                 resetCamera = false;
             }
+            // Set target values
+            targetPitch = defaultPitchAngle;
+            targetYaw = rb.transform.eulerAngles.y;
         }
+    }
+
+    private void SetCameraDistance()
+    {
+        mainCamera.transform.position = lookTarget.position - mainCamera.transform.forward * distanceFromTarget;
     }
 
 }
