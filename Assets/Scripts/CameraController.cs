@@ -1,9 +1,10 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Netcode;
 using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody))]
-public class CameraController : MonoBehaviour
+public class CameraController : NetworkBehaviour
 {
     [Header("References")]
     [SerializeField] Transform lookTarget;
@@ -27,17 +28,20 @@ public class CameraController : MonoBehaviour
     float currentPitch, targetPitch, pitchSmoothVelocity;
     float currentYaw, targetYaw, yawSmoothVelocity;
 
-    void Start()
+    public override void OnNetworkSpawn()
     {
+        if (!IsOwner) return;
+
+        base.OnNetworkSpawn();
         rb = GetComponent<Rigidbody>();
         timer = 0;
         mainCamera = Camera.main;
-        Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible = false;
     }
 
     void LateUpdate()
     {
+        if (!IsOwner) return;
+
         HandleCameraControls(InputManager.instance.lookInput);
         SetCameraDistance();
     }

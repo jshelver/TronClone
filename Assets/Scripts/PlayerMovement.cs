@@ -1,9 +1,10 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Unity.Netcode;
 
 [RequireComponent(typeof(Rigidbody))]
-public class PlayerMovement : MonoBehaviour
+public class PlayerMovement : NetworkBehaviour
 {
     [Header("References")]
     Rigidbody rb;
@@ -14,13 +15,19 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] float steeringDamper = 0.5f;
     [SerializeField] float stabilizeSpeed = 0.5f;
 
-    void Start()
+    public override void OnNetworkSpawn()
     {
+        if (!IsOwner) return;
+
+        base.OnNetworkSpawn();
+        transform.position = new Vector3(Random.Range(-10, 10), 1f, Random.Range(-10, 10));
         rb = GetComponent<Rigidbody>();
     }
 
     void FixedUpdate()
     {
+        if (!IsOwner) return;
+
         HandleAcceleration(InputManager.instance.accelerationInput);
         HandleSteering(InputManager.instance.steeringInput);
         StabilizeRigidbodyRotation();
