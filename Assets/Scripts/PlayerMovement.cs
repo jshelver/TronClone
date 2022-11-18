@@ -10,6 +10,7 @@ public class PlayerMovement : NetworkBehaviour
     Rigidbody rb;
 
     [Header("Movement Settings")]
+    [SerializeField] bool autoMoveForward = true;
     [SerializeField] float moveSpeed = 9f;
     [SerializeField] float turnSpeed = 5f;
     [SerializeField] float steeringDamper = 0.5f;
@@ -39,7 +40,7 @@ public class PlayerMovement : NetworkBehaviour
         Vector3 moveDirection = rb.transform.forward * Mathf.Clamp(accelerationInput, 0f, 1f);
 
         // Move player
-        rb.AddForce(moveDirection * moveSpeed * 100f * Time.deltaTime);
+        rb.AddForce((autoMoveForward ? rb.transform.forward : moveDirection) * moveSpeed * 100f * Time.deltaTime);
 
         LimitVelocity();
     }
