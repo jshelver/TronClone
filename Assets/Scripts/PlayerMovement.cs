@@ -11,6 +11,8 @@ public class PlayerMovement : MonoBehaviour
     [Header("Movement Settings")]
     [SerializeField] float moveSpeed = 9f;
     [SerializeField] float turnSpeed = 5f;
+    [SerializeField] float steeringDamper = 0.5f;
+    [SerializeField] float stabilizeSpeed = 0.5f;
 
     void Start()
     {
@@ -21,6 +23,7 @@ public class PlayerMovement : MonoBehaviour
     {
         HandleAcceleration(InputManager.instance.accelerationInput);
         HandleSteering(InputManager.instance.steeringInput);
+        StabilizeRigidbodyRotation();
     }
 
     private void HandleAcceleration(float accelerationInput)
@@ -57,5 +60,16 @@ public class PlayerMovement : MonoBehaviour
     private void LimitAngularVelocity()
     {
         rb.maxAngularVelocity = 1.8f;
+        rb.AddTorque(-rb.angularVelocity * steeringDamper, ForceMode.Acceleration);
+    }
+
+    private void StabilizeRigidbodyRotation()
+    {
+        // Find quaternion of distance between current up and world up
+        Quaternion deltaQuat = Quaternion.FromToRotation(rb.transform.up, Vector3.up);
+        // Get the angle and axis of that quaternion
+        deltaQuat.ToAngleAxis(out float angle, out Vector3 axis);
+        // Apply torque that returns rb to world up
+        rb.AddTorque(axis.normalized * angle * stabilizeSpeed, ForceMode.Acceleration);
     }
 }
