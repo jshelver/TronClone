@@ -6,8 +6,6 @@ using UnityEngine;
 public class PlayerMovement : MonoBehaviour
 {
     [Header("References")]
-    [SerializeField] Transform cameraTransform;
-    [SerializeField] Transform lookTarget;
     Rigidbody rb;
 
     [Header("Movement Settings")]
@@ -49,10 +47,15 @@ public class PlayerMovement : MonoBehaviour
 
     private void HandleSteering(float steeringInput)
     {
-        lookTarget.forward = rb.transform.forward;
-
         Vector3 torque = rb.transform.up * steeringInput;
 
         rb.AddTorque(torque * turnSpeed * 100 * Time.deltaTime);
+
+        LimitAngularVelocity();
+    }
+
+    private void LimitAngularVelocity()
+    {
+        rb.maxAngularVelocity = 1.8f;
     }
 }

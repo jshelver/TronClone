@@ -780,7 +780,7 @@ MonoBehaviour:
   maxViewAngle: 85
   minViewAngle: -40
   rotationSmoothTime: 0.02
-  resetCameraSmoothTime: 0.4
+  resetCameraSmoothTime: 0.3
   resetCameraCooldownTime: 3
   defaultPitchAngle: 20
 --- !u!136 &741298862
@@ -857,10 +857,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7bfa74785a722974bb9767ce7d1ca2b1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  cameraTransform: {fileID: 963194228}
-  lookTarget: {fileID: 2056615439}
   moveSpeed: 10
-  turnSpeed: 5
+  turnSpeed: 3.4
 --- !u!43 &837837295
 Mesh:
   m_ObjectHideFlags: 0
@@ -1077,7 +1075,7 @@ Camera:
     height: 1
   near clip plane: 0.3
   far clip plane: 1000
-  field of view: 60
+  field of view: 75
   orthographic: 0
   orthographic size: 5
   m_Depth: -1
