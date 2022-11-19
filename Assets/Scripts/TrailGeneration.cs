@@ -11,10 +11,15 @@ public class TrailGeneration : MonoBehaviour
 
     [Header("Trail Generation Settings")]
     [SerializeField] bool divideLine = true;
-    [SerializeField] float trailSectionLength = 2f;
     [SerializeField] float trailWidth = 0.2f;
-    [SerializeField] float divideTrailSpawnDelay = 0.5f;
+
+    [Header("Update Trail Settings")]
     [SerializeField] float updateTrailSpawnDelay = 0.1f;
+    [SerializeField] int maxNumberOfVertices = 1000; // must be divisible by 4
+
+    [Header("Divide Trail Settings")]
+    [SerializeField] float divideTrailSpawnDelay = 0.5f;
+    [SerializeField] float trailSectionLength = 2f;
     [SerializeField] float trailLifeTime = 5f;
     float spawnTime;
     bool firstTime, isEven;
@@ -59,7 +64,7 @@ public class TrailGeneration : MonoBehaviour
         Vector3[] vertices = null;
         int[] triangles = null;
 
-        Vector3 backward = trailCreationPointTransform.position - (trailCreationPointTransform.forward);
+        Vector3 backward = trailCreationPointTransform.position;
 
         if (firstTime)
         {
@@ -113,6 +118,25 @@ public class TrailGeneration : MonoBehaviour
             return;
         }
 
+        if (numberOfVertices >= maxNumberOfVertices)
+        {
+            numberOfVertices -= 4;
+            for (int i = 0; i < 4; i++)
+            {
+                verticesDef.RemoveAt(0);
+            }
+            for (int i = 0; i < 30; i++)
+            {
+                trianglesDef.RemoveAt(0);
+            }
+            List<int> temp = new List<int>(); ;
+            for (int i = 0; i < trianglesDef.Count; i++)
+            {
+                temp.Add(trianglesDef[i] - 4);
+            }
+            trianglesDef = temp;
+        }
+
         if (isEven)
         {
             verticesDef.Add(backward + (trailCreationPointTransform.right * -trailWidth));
@@ -157,7 +181,13 @@ public class TrailGeneration : MonoBehaviour
             trianglesDef.Add(numberOfVertices - 1);
 
             // Back face
+            trianglesDef.Add(numberOfVertices);
+            trianglesDef.Add(numberOfVertices + 1);
+            trianglesDef.Add(numberOfVertices + 2);
 
+            trianglesDef.Add(numberOfVertices);
+            trianglesDef.Add(numberOfVertices + 2);
+            trianglesDef.Add(numberOfVertices + 3);
 
             isEven = false;
         }
@@ -203,6 +233,15 @@ public class TrailGeneration : MonoBehaviour
             trianglesDef.Add(numberOfVertices - 3);
             trianglesDef.Add(numberOfVertices + 3);
             trianglesDef.Add(numberOfVertices - 4);
+
+            // Back face
+            trianglesDef.Add(numberOfVertices);
+            trianglesDef.Add(numberOfVertices + 1);
+            trianglesDef.Add(numberOfVertices + 2);
+
+            trianglesDef.Add(numberOfVertices);
+            trianglesDef.Add(numberOfVertices + 2);
+            trianglesDef.Add(numberOfVertices + 3);
 
             isEven = true;
         }
