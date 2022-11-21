@@ -225,7 +225,7 @@ MonoBehaviour:
   minViewAngle: -40
   rotationSmoothTime: 0.02
   resetCameraSmoothTime: 0.3
-  resetCameraCooldownTime: 3
+  resetCameraCooldownTime: 0.5
   defaultPitchAngle: 20
 --- !u!114 &3038021614655627545
 MonoBehaviour:
